@@ -8,11 +8,11 @@ const ListingCard = ({ listing }) => {
   const [endDate, setEndDate] = useState("");
   const token = localStorage.getItem("token");
 
-  if (!listing) return null;
+  if (!listing) return null; // Safe check
 
   const handleBookClick = () => {
     if (!token) {
-      window.location.href = "/login";
+      window.location.href = "/login"; // redirect to login
       return;
     }
     setShowBookingForm(true);
@@ -25,7 +25,7 @@ const ListingCard = ({ listing }) => {
     }
     try {
       await axios.post(
-        `${import.meta.env.VITE_API_URL}/create/booking`,
+        "http://localhost:5000/create/booking",
         {
           listingId: listing._id,
           startDate,
@@ -48,11 +48,11 @@ const ListingCard = ({ listing }) => {
   return (
     <div className="card h-100 shadow-sm">
       <img
-        src={getImageUrl(listing.image)}
-        className="card-img-top"
-        alt={listing.title || "Listing"}
-        style={{ height: "200px", objectFit: "cover" }}
-      />
+  src={getImageUrl(listing.image)}
+  alt={listing.title || "Listing"}
+  className="card-img-top"
+  style={{ height: "200px", objectFit: "cover" }}
+/>
       <div className="card-body d-flex flex-column">
         <h5 className="card-title">{listing.title || "No title"}</h5>
         <p className="text-muted mb-1">{listing.city || "No city"}</p>

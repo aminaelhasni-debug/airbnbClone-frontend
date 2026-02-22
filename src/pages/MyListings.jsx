@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { listingsAPI, getErrorMessage } from "../service/api";
-import { getImageUrl } from "../utils/getImageUrl";
+import { listingsAPI, getImageUrl, getErrorMessage } from "../service/api";
 
 const MyListings = () => {
   const [listings, setListings] = useState([]);
@@ -8,6 +7,7 @@ const MyListings = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  // Fetch all user's listings
   const getMyListings = async () => {
     setLoading(true);
     setError("");
@@ -23,10 +23,11 @@ const MyListings = () => {
     }
   };
 
+  // Fetch single listing by ID
   const getListingById = async (id) => {
     try {
       const res = await listingsAPI.getListingById(id);
-      setSelectedListing(res.data);
+      setSelectedListing(res.data); // store in separate state
     } catch (err) {
       console.error(err);
       setError(getErrorMessage(err));
@@ -37,7 +38,7 @@ const MyListings = () => {
     getMyListings();
   }, []);
 
-  if (loading)
+  if (loading) {
     return (
       <div className="container my-5 text-center py-5">
         <div className="spinner-border" role="status">
@@ -46,6 +47,7 @@ const MyListings = () => {
         <p className="mt-3 text-muted">Loading your listings...</p>
       </div>
     );
+  }
 
   return (
     <div className="container my-5">
@@ -54,7 +56,11 @@ const MyListings = () => {
       {error && (
         <div className="alert alert-danger alert-dismissible fade show" role="alert">
           {error}
-          <button type="button" className="btn-close" onClick={() => setError("")} />
+          <button
+            type="button"
+            className="btn-close"
+            onClick={() => setError("")}
+          />
         </div>
       )}
 
@@ -90,6 +96,7 @@ const MyListings = () => {
         )}
       </div>
 
+      {/* Show selected listing details */}
       {selectedListing && (
         <div className="mt-5 p-4 border rounded">
           <h4>{selectedListing.title}</h4>
