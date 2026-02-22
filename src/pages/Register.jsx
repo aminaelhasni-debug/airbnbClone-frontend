@@ -1,10 +1,11 @@
 import { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { authAPI, getErrorMessage } from "../service/api";
 
 const Register = ({ onLogin }) => {
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   // Frontend validation
@@ -22,6 +23,7 @@ const Register = ({ onLogin }) => {
 
   const submit = async (e) => {
     e.preventDefault();
+    setError("");
 
     const validationError = validate();
     if (validationError) {
@@ -29,32 +31,45 @@ const Register = ({ onLogin }) => {
       return;
     }
 
+    setLoading(true);
     try {
-      await axios.post("http://localhost:5000/register", form);
-      alert("Registered successfully!");
+      await authAPI.register(form);
       navigate("/login"); // redirect to login
     } catch (err) {
       console.error(err);
-      setError(err.response?.data?.message || "Registration failed");
+      setError(getErrorMessage(err));
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="container mt-5" style={{ maxWidth: 400 }}>
       <h3>Register</h3>
-      {error && <p className="text-danger">{error}</p>}
+      {error && (
+        <div className="alert alert-danger alert-dismissible fade show" role="alert">
+          {error}
+          <button
+            type="button"
+            className="btn-close"
+            onClick={() => setError("")}
+          />
+        </div>
+      )}
       <form onSubmit={submit}>
         <input
           className="form-control mb-3"
           placeholder="Name"
           value={form.name}
           onChange={(e) => setForm({ ...form, name: e.target.value })}
+          disabled={loading}
         />
         <input
           className="form-control mb-3"
           placeholder="Email"
           value={form.email}
           onChange={(e) => setForm({ ...form, email: e.target.value })}
+          disabled={loading}
         />
         <input
           className="form-control mb-3"
@@ -62,8 +77,11 @@ const Register = ({ onLogin }) => {
           placeholder="Password"
           value={form.password}
           onChange={(e) => setForm({ ...form, password: e.target.value })}
+          disabled={loading}
         />
-        <button className="btn btn-primary w-100">Register</button>
+        <button className="btn btn-primary w-100" disabled={loading}>
+          {loading ? "Registering..." : "Register"}
+        </button>
       </form>
     </div>
   );

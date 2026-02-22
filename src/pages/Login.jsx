@@ -1,10 +1,11 @@
 import { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { authAPI, getErrorMessage } from "../service/api";
 
 const Login = ({ onLogin }) => {
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   // Simple email regex validation
@@ -18,6 +19,7 @@ const Login = ({ onLogin }) => {
 
   const submit = async (e) => {
     e.preventDefault();
+    setError("");
 
     const validationError = validate();
     if (validationError) {
@@ -25,8 +27,9 @@ const Login = ({ onLogin }) => {
       return;
     }
 
+    setLoading(true);
     try {
-      const res = await axios.post("http://localhost:5000/login", form);
+      const res = await authAPI.login(form);
 
       // Save JWT token in localStorage
       localStorage.setItem("token", res.data.token);
@@ -34,24 +37,35 @@ const Login = ({ onLogin }) => {
       // Optional: update app state for logged-in user
       if (onLogin) onLogin();
 
-      alert("Logged in successfully!");
-      navigate("/"); // redirect to home or dashboard
+      navigate("/"); // redirect to home
     } catch (err) {
       console.error(err);
-      setError(err.response?.data?.message || "Login failed");
+      setError(getErrorMessage(err));
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="container mt-5" style={{ maxWidth: 400 }}>
       <h3>Login</h3>
-      {error && <p className="text-danger">{error}</p>}
+      {error && (
+        <div className="alert alert-danger alert-dismissible fade show" role="alert">
+          {error}
+          <button
+            type="button"
+            className="btn-close"
+            onClick={() => setError("")}
+          />
+        </div>
+      )}
       <form onSubmit={submit}>
         <input
           className="form-control mb-3"
           placeholder="Email"
           value={form.email}
           onChange={(e) => setForm({ ...form, email: e.target.value })}
+          disabled={loading}
         />
         <input
           className="form-control mb-3"
@@ -59,8 +73,11 @@ const Login = ({ onLogin }) => {
           placeholder="Password"
           value={form.password}
           onChange={(e) => setForm({ ...form, password: e.target.value })}
+          disabled={loading}
         />
-        <button className="btn btn-primary w-100">Login</button>
+        <button className="btn btn-primary w-100" disabled={loading}>
+          {loading ? "Logging in..." : "Login"}
+        </button>
       </form>
     </div>
   );

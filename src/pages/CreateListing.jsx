@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import { listingsAPI, getErrorMessage } from "../service/api";
 
 const CreateListing = () => {
   const [title, setTitle] = useState("");
@@ -8,10 +8,18 @@ const CreateListing = () => {
   const [pricePerNight, setPricePerNight] = useState("");
   const [image, setImage] = useState(null);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
 
+    if (!title || !description || !city || !pricePerNight) {
+      setError("Please fill in all required fields");
+      return;
+    }
+
+    setLoading(true);
     try {
       const formData = new FormData();
       formData.append("title", title);
@@ -20,12 +28,7 @@ const CreateListing = () => {
       formData.append("pricePerNight", pricePerNight);
       if (image) formData.append("image", image);
 
-      await axios.post("http://localhost:5000/create/listing", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${localStorage.getItem("token")}`, // if JWT protected
-        },
-      });
+      await listingsAPI.createListing(formData);
 
       // reset form
       setTitle("");
@@ -33,19 +36,28 @@ const CreateListing = () => {
       setCity("");
       setPricePerNight("");
       setImage(null);
-      setError("");
-
       alert("Listing created successfully!");
     } catch (err) {
-      console.error("Create error:", err.response?.data || err.message);
-      setError(err.response?.data?.message || "Failed to create listing");
+      console.error("Create error:", err);
+      setError(getErrorMessage(err));
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="container mt-5" style={{ maxWidth: 500 }}>
       <h3>Create Listing</h3>
-      {error && <p className="text-danger">{error}</p>}
+      {error && (
+        <div className="alert alert-danger alert-dismissible fade show" role="alert">
+          {error}
+          <button
+            type="button"
+            className="btn-close"
+            onClick={() => setError("")}
+          />
+        </div>
+      )}
       <form onSubmit={handleSubmit}>
         <input
           type="text"
@@ -53,6 +65,7 @@ const CreateListing = () => {
           placeholder="Title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
+          disabled={loading}
           required
         />
         <textarea
@@ -60,6 +73,8 @@ const CreateListing = () => {
           placeholder="Description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
+          disabled={loading}
+          required
         />
         <input
           type="text"
@@ -67,6 +82,7 @@ const CreateListing = () => {
           placeholder="City"
           value={city}
           onChange={(e) => setCity(e.target.value)}
+          disabled={loading}
           required
         />
         <input
@@ -75,6 +91,7 @@ const CreateListing = () => {
           placeholder="Price per night"
           value={pricePerNight}
           onChange={(e) => setPricePerNight(e.target.value)}
+          disabled={loading}
           required
         />
         <input
@@ -82,9 +99,10 @@ const CreateListing = () => {
           className="form-control mb-3"
           accept="image/*"
           onChange={(e) => setImage(e.target.files[0])}
+          disabled={loading}
         />
-        <button type="submit" className="btn btn-primary w-100">
-          Create Listing
+        <button type="submit" className="btn btn-primary w-100" disabled={loading}>
+          {loading ? "Creating..." : "Create Listing"}
         </button>
       </form>
     </div>

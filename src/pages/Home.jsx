@@ -1,19 +1,25 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import ListingCard from "../component/ListingCard";
+import { listingsAPI, getErrorMessage } from "../service/api";
 
 const Home = () => {
   const [listings, setListings] = useState([]);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
 
   // Fetch listings
   const fetchListings = async () => {
+    setLoading(true);
+    setError("");
     try {
-      const res = await axios.get("http://localhost:5000/listings"); 
+      const res = await listingsAPI.getAllListings();
       setListings(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error("Error fetching listings:", err);
-      setError("Failed to load listings");
+      setError(getErrorMessage(err));
+      setListings([]);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -43,22 +49,40 @@ const Home = () => {
 
       {/* Listings */}
       <div className="container my-5">
-        {error && <p className="text-danger text-center">{error}</p>}
+        {error && (
+          <div className="alert alert-danger alert-dismissible fade show" role="alert">
+            {error}
+            <button
+              type="button"
+              className="btn-close"
+              onClick={() => setError("")}
+            />
+          </div>
+        )}
 
-        <div className="row g-4">
-          {listings.length > 0 ? (
-            listings.map((listing) => (
-              <div className="col-md-4" key={listing._id}>
-                <ListingCard
-                  listing={listing}
-                  onBookingDeleted={handleBookingDeleted}
-                />
-              </div>
-            ))
-          ) : (
-            <p className="text-center text-muted">No listings available.</p>
-          )}
-        </div>
+        {loading ? (
+          <div className="text-center py-5">
+            <div className="spinner-border" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+            <p className="mt-3 text-muted">Loading listings...</p>
+          </div>
+        ) : (
+          <div className="row g-4">
+            {listings.length > 0 ? (
+              listings.map((listing) => (
+                <div className="col-md-4" key={listing._id}>
+                  <ListingCard
+                    listing={listing}
+                    onBookingDeleted={handleBookingDeleted}
+                  />
+                </div>
+              ))
+            ) : (
+              <p className="text-center text-muted">No listings available.</p>
+            )}
+          </div>
+        )}
       </div>
     </>
   );
