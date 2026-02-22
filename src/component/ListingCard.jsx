@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import { getImageUrl } from "../utils/getImageUrl";
 
 const ListingCard = ({ listing }) => {
   const [showBookingForm, setShowBookingForm] = useState(false);
@@ -7,11 +8,11 @@ const ListingCard = ({ listing }) => {
   const [endDate, setEndDate] = useState("");
   const token = localStorage.getItem("token");
 
-  if (!listing) return null; // Safe check
+  if (!listing) return null;
 
   const handleBookClick = () => {
     if (!token) {
-      window.location.href = "/login"; // redirect to login
+      window.location.href = "/login";
       return;
     }
     setShowBookingForm(true);
@@ -24,7 +25,7 @@ const ListingCard = ({ listing }) => {
     }
     try {
       await axios.post(
-        "http://localhost:5000/create/booking",
+        `${import.meta.env.VITE_API_URL}/create/booking`,
         {
           listingId: listing._id,
           startDate,
@@ -47,7 +48,7 @@ const ListingCard = ({ listing }) => {
   return (
     <div className="card h-100 shadow-sm">
       <img
-        src={listing.image ? `http://localhost:5000${listing.image}` : "https://via.placeholder.com/400x250"}
+        src={getImageUrl(listing.image)}
         className="card-img-top"
         alt={listing.title || "Listing"}
         style={{ height: "200px", objectFit: "cover" }}
