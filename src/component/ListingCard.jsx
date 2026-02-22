@@ -1,6 +1,5 @@
 import { useState } from "react";
 import axios from "axios";
-import { getImageUrl } from "../utils/getImageUrl";
 
 const ListingCard = ({ listing }) => {
   const [showBookingForm, setShowBookingForm] = useState(false);
@@ -48,11 +47,11 @@ const ListingCard = ({ listing }) => {
   return (
     <div className="card h-100 shadow-sm">
       <img
-  src={getImageUrl(listing.image)}
-  alt={listing.title || "Listing"}
-  className="card-img-top"
-  style={{ height: "200px", objectFit: "cover" }}
-/>
+        src={listing.image ? `http://localhost:5000${listing.image}` : "https://via.placeholder.com/400x250"}
+        className="card-img-top"
+        alt={listing.title || "Listing"}
+        style={{ height: "200px", objectFit: "cover" }}
+      />
       <div className="card-body d-flex flex-column">
         <h5 className="card-title">{listing.title || "No title"}</h5>
         <p className="text-muted mb-1">{listing.city || "No city"}</p>
