@@ -6,7 +6,11 @@
 import axios from 'axios';
 
 // Get API base URL from environment variables
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL ||
+  (import.meta.env.DEV
+    ? 'http://localhost:5000'
+    : 'https://airbnb-clone-backend-lemon.vercel.app');
 
 // Create axios instance with default config
 const apiClient = axios.create({
@@ -124,7 +128,7 @@ export const getErrorMessage = (error) => {
  * @returns {string} - Full URL
  */
 export const getImageUrl = (path) => {
-  if (!path) return '/placeholder-image.png'; // fallback
+  if (!path) return 'https://via.placeholder.com/400x250'; // fallback
   if (path.startsWith('http')) return path; // already full URL
   return `${API_BASE_URL}${path}`;
 };

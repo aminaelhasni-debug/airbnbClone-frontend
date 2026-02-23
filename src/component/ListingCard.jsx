@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import { bookingsAPI, getImageUrl, getErrorMessage } from "../service/api";
 
 const ListingCard = ({ listing }) => {
   const [showBookingForm, setShowBookingForm] = useState(false);
@@ -23,31 +23,25 @@ const ListingCard = ({ listing }) => {
       return;
     }
     try {
-      await axios.post(
-        "http://localhost:5000/create/booking",
-        {
-          listingId: listing._id,
-          startDate,
-          endDate,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      await bookingsAPI.createBooking({
+        listingId: listing._id,
+        startDate,
+        endDate,
+      });
       alert("Booking created successfully!");
       setShowBookingForm(false);
       setStartDate("");
       setEndDate("");
     } catch (err) {
       console.error(err);
-      alert("Booking failed");
+      alert(getErrorMessage(err) || "Booking failed");
     }
   };
 
   return (
     <div className="card h-100 shadow-sm">
       <img
-        src={listing.image ? `http://localhost:5000${listing.image}` : "https://via.placeholder.com/400x250"}
+        src={getImageUrl(listing.image)}
         className="card-img-top"
         alt={listing.title || "Listing"}
         style={{ height: "200px", objectFit: "cover" }}
