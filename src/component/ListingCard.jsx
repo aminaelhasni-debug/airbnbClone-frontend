@@ -1,17 +1,19 @@
 import { useState } from "react";
 import { bookingsAPI, getImageUrl, getErrorMessage } from "../service/api";
+import { useNavigate } from "react-router-dom";
 
-const ListingCard = ({ listing }) => {
+  const ListingCard = ({ listing }) => {
   const [showBookingForm, setShowBookingForm] = useState(false);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const token = localStorage.getItem("token");
+  const navigate = useNavigate();
 
-  if (!listing) return null; // Safe check
+if (!listing) return null;
 
   const handleBookClick = () => {
     if (!token) {
-      window.location.href = "/login"; // redirect to login
+      navigate("/login");
       return;
     }
     setShowBookingForm(true);
