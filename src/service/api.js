@@ -99,6 +99,16 @@ export const bookingsAPI = {
  * @returns {string} - User-friendly error message
  */
 export const getErrorMessage = (error) => {
+  const backendError = error?.response?.data?.error || '';
+
+  if (
+    error.response?.status === 503 ||
+    backendError.includes('buffering timed out') ||
+    backendError.includes('Server selection timed out')
+  ) {
+    return 'Server database is temporarily unavailable. Please try again in a minute.';
+  }
+
   if (error.response?.data?.message) {
     return error.response.data.message;
   }
