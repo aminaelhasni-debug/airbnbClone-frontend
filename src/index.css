@@ -66,3 +66,61 @@ footer {
   position: relative;
   z-index: 1; /* make text above overlay */
 }
+
+.navbar-burger {
+  display: none;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.navbar-burger-line {
+  display: block;
+  width: 18px;
+  height: 2px;
+  background-color: #212529;
+  border-radius: 2px;
+}
+
+.navbar-links-desktop {
+  display: flex;
+}
+
+.navbar-mobile-menu {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transform: translateY(-8px);
+  transition: max-height 0.3s ease, opacity 0.25s ease, transform 0.25s ease;
+}
+
+.navbar-mobile-menu.open {
+  max-height: 420px;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (max-width: 991.98px) {
+  .navbar-burger {
+    display: inline-flex;
+  }
+
+  .navbar-links-desktop {
+    display: none !important;
+  }
+
+  .navbar-mobile-menu .btn {
+    width: 100%;
+    text-align: left;
+  }
+}
+
+@media (min-width: 992px) {
+  .navbar-mobile-menu {
+    display: none;
+  }
+}
