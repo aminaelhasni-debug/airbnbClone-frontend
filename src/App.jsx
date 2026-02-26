@@ -1,6 +1,4 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 import { useState } from "react"; // keep this
 
@@ -58,4 +56,3 @@ function App() {
 }
 
 export default App;
-
